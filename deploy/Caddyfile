@@ -1,0 +1,48 @@
+{
+  # ============================================================
+  #  Caddyfile — automatic HTTPS for StudyPalace on Lightsail
+  # ============================================================
+  #  Caddy gets and renews Let's Encrypt certificates for you.
+  #  Replace studypalace.in with YOUR domain (both places below).
+  #
+  #  IMPORTANT: your domain's A record must already point at this
+  #  server's static IP before Caddy can issue a certificate.
+  # ============================================================
+
+	studypalace.in, www.studypalace.in {
+		# Next.js listens on 127.0.0.1:3000 (localhost only — not public)
+		reverse_proxy 127.0.0.1:3000
+
+		encode gzip zstd
+
+		# Security headers
+		header {
+			Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+			X-Content-Type-Options "nosniff"
+			-Server
+		}
+
+		# Never let a crawler or a browser cache the private areas
+		@private path /admin /admin/* /api/admin/* /api/download/* /order/* /checkout /my-downloads
+		header @private Cache-Control "no-store, max-age=0"
+
+		# Your PDFs are big — allow generous upload + download time
+		@uploads path /api/admin/products /api/admin/media
+		request_body @uploads {
+			max_size 200MB
+		}
+
+		log {
+			output file /var/log/caddy/studypalace.log {
+				roll_size 10mb
+				roll_keep 5
+			}
+		}
+	}
+
+	# ---- No domain yet? Use this block instead (delete the one above) ----
+	# It serves plain HTTP on the server's IP so you can test before DNS.
+	# :80 {
+	# 	reverse_proxy 127.0.0.1:3000
+	# 	encode gzip
+	# }
