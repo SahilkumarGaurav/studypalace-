@@ -1,0 +1,46 @@
+{
+  "name": "studypalace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "StudyPalace — buy & instantly download NIFT preparation eBooks and PDFs (GAT, CAT, Situation Test).",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "assets": "node scripts/generate-assets.mjs",
+    "make-sample": "node scripts/make-sample-pdf.mjs",
+    "test:e2e": "node scripts/e2e-test.mjs",
+    "test:memory": "node scripts/test-memory-backend.mjs",
+    "test": "node scripts/test-memory-backend.mjs && node scripts/e2e-test.mjs",
+    "secret": "node scripts/generate-secret.mjs"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.10.0",
+    "next": "15.5.28",
+    "pg": "^8.23.1",
+    "razorpay": "^2.9.8",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "server-only": "^0.0.1",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^20.14.0",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "sharp": "^0.35.5",
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.5.4"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  }
+}
