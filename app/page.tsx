@@ -157,7 +157,7 @@ export default function HomePage() {
                 ))}
               </div>
             ) : (
-              <HeroMock />
+              <HeroPlaceholder />
             )}
           </div>
         </div>
@@ -218,10 +218,10 @@ export default function HomePage() {
           <div className="mt-8">
             <ProductGrid
               products={showcase.length ? (bestsellers.length ? bestsellers : showcase) : []}
-              emptyTitle="The store is being stocked"
-              emptyText="Products are uploaded from the admin panel. As soon as the first PDF goes live it will appear here, on the shop page and in Google."
-              href="/shop"
-              hrefLabel="Open the shop"
+              emptyTitle="Practice PDFs are on their way"
+              emptyText="The GAT, CAT and Situation Test files are being finalised right now. While you wait, the complete topic-wise syllabus and study plans are free to read."
+              href="/guides"
+              hrefLabel="Read the free NIFT guides"
             />
           </div>
         </div>
@@ -288,7 +288,7 @@ export default function HomePage() {
                     <span className="text-sm text-white/50 line-through">₹2,450</span>
                     <span className="badge mb-1 bg-gold-400 text-ink-950">67% off</span>
                   </div>
-                  <p className="text-xs text-white/50">Sample pricing — set your own from the admin panel.</p>
+                  <p className="text-xs text-white/50">Bundle pricing lands soon — the guides below are free in the meantime.</p>
                 </div>
               )}
             </div>
@@ -679,34 +679,54 @@ function BundleCard({ product }: { product: Product }) {
   );
 }
 
-function HeroMock() {
+function HeroPlaceholder() {
+  // Shown only while the catalogue is empty. Customer-facing: it sells the
+  // value of the store and points at the free guides. It must never mention
+  // the admin panel, credentials or any other internal detail.
   return (
-    <div className="relative rounded-4xl border border-ink-100 bg-white p-5 shadow-card">
-      <div className="flex items-center justify-between">
-        <span className="badge bg-brand-50 text-brand-700">Preview</span>
-        <span className="text-[11px] font-bold uppercase tracking-widest text-ink-300">StudyPalace</span>
-      </div>
-      <p className="mt-4 font-display text-xl font-extrabold leading-snug text-ink-950">
-        Your store is ready. Add your first PDF from the admin panel.
+    <div className="relative overflow-hidden rounded-4xl border border-ink-100 bg-white p-6 shadow-card sm:p-7">
+      <div
+        className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-brand-100/70 blur-2xl"
+        aria-hidden="true"
+      />
+      <span className="badge relative bg-mint-100 text-mint-700">New store • material uploading now</span>
+
+      <p className="relative mt-4 font-display text-[22px] font-extrabold leading-snug text-ink-950">
+        NIFT 2027 practice material, built section by section.
       </p>
-      <p className="mt-2 text-sm leading-6 text-ink-600">
-        Upload a PDF, set a price, write two lines about what is inside — it appears on the shop page, in Google
-        search results and in the sitemap automatically.
+      <p className="relative mt-2.5 text-[14.5px] leading-7 text-ink-600">
+        Topic-wise GAT question banks, CAT drawing and perspective sheets, Situation Test model briefs,
+        previous year papers and monthly current-affairs capsules. Every file downloads the moment you pay.
       </p>
-      <div className="mt-5 space-y-2">
-        {['GAT Quantitative Ability — 240 Qs', 'CAT Perspective & Composition Sheets', 'Situation Test: 50 Model Briefs'].map(
-          (t) => (
-            <div key={t} className="flex items-center justify-between rounded-2xl bg-ink-50/70 px-4 py-3">
-              <span className="text-[13px] font-bold text-ink-800">{t}</span>
-              <span className="text-[12px] font-extrabold text-brand-600">₹199</span>
-            </div>
-          ),
-        )}
+
+      <ul className="relative mt-5 space-y-2.5">
+        {[
+          ['GAT', 'Quant • English • Reasoning • GK & Current Affairs'],
+          ['CAT', 'Perspective grids • human figures • composition • colour'],
+          ['Situation Test', '50 model briefs • joints • the write-up format'],
+        ].map(([title, body]) => (
+          <li key={title} className="flex items-start gap-3 rounded-2xl bg-ink-50/70 px-4 py-3">
+            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-[10px] font-extrabold text-white">
+              {title.slice(0, 2).toUpperCase()}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[13.5px] font-extrabold text-ink-950">{title}</span>
+              <span className="block text-[12.5px] leading-5 text-ink-600">{body}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="relative mt-6 rounded-2xl border border-gold-200 bg-gold-50 p-4">
+        <p className="text-[13.5px] font-extrabold text-ink-950">Start free while the shop fills up</p>
+        <p className="mt-1 text-[13px] leading-6 text-ink-700">
+          Our complete syllabus guides are free and public — every GAT topic in order, the CAT practice plan and the
+          Situation Test write-up format.
+        </p>
+        <Link href="/guides" className="btn-primary btn-sm mt-3.5 w-full">
+          Read the free NIFT guides →
+        </Link>
       </div>
-      <Link href="/admin" className="btn-dark mt-6 w-full">
-        Open admin panel →
-      </Link>
-      <p className="mt-2 text-center text-[11px] text-ink-400">Protected by your ADMIN_EMAIL / ADMIN_PASSWORD</p>
     </div>
   );
 }
