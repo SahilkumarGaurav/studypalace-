@@ -94,3 +94,74 @@ export function formatPaise(paise: number): string {
   const rupees = (Number(paise) || 0) / 100;
   return `₹${rupees.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 }
+
+/* ------------------------------------------------------------------ */
+/* Server reconciliation                                               */
+/* ------------------------------------------------------------------ */
+
+const SYNC_TS_KEY = 'studypalace.cart.syncedAt';
+const SYNC_EVERY_MS = 2 * 60 * 1000; // throttle background syncs to once per 2 min
+
+export interface CartSyncResult {
+  /** ids that are gone / unpublished / unsellable and were dropped */
+  removed: string[];
+  /** the cart as it now stands, with fresh prices & titles from the server */
+  kept: CartLine[];
+}
+
+function sessionGet(key: string): string {
+  try {
+    return window.sessionStorage.getItem(key) || '';
+  } catch {
+    return '';
+  }
+}
+function sessionSet(key: string, value: string) {
+  try {
+    window.sessionStorage.setItem(key, value);
+  } catch {
+    /* private browsing — ignore */
+  }
+}
+
+/**
+ * Reconcile the local basket with the live catalogue.
+ *
+ * Products deleted or unpublished from the admin panel disappear from the
+ * cart, and surviving lines pick up current prices/titles/covers. Safe to
+ * call often: background calls are throttled to once every couple of minutes,
+ * and checkout passes { force: true } to always get a fresh answer.
+ */
+export async function syncCartWithServer(opts: { force?: boolean } = {}): Promise<CartSyncResult> {
+  if (typeof window === 'undefined') return { removed: [], kept: [] };
+  const lines = read();
+  if (!lines.length) return { removed: [], kept: lines };
+
+  if (!opts.force) {
+    const last = Number(sessionGet(SYNC_TS_KEY) || 0);
+    if (Date.now() - last < SYNC_EVERY_MS) return { removed: [], kept: lines };
+  }
+  sessionSet(SYNC_TS_KEY, String(Date.now()));
+
+  try {
+    const res = await fetch(`/api/cart/sync?ids=${encodeURIComponent(lines.map((l) => l.id).join(','))}`, {
+      cache: 'no-store',
+    });
+    if (!res.ok) return { removed: [], kept: lines };
+    const data: { ok?: boolean; lines?: CartLine[]; removed?: string[] } = await res.json();
+
+    const server = new Map((data.lines || []).map((l) => [l.id, l]));
+    const removed = (data.removed || []).filter((id) => lines.some((l) => l.id === id));
+    const kept = lines.filter((l) => server.has(l.id)).map((l) => server.get(l.id)!);
+
+    const changed =
+      removed.length > 0 ||
+      kept.length !== lines.length ||
+      JSON.stringify(kept) !== JSON.stringify(lines);
+    if (changed) write(kept);
+
+    return { removed, kept };
+  } catch {
+    return { removed: [], kept: lines };
+  }
+}

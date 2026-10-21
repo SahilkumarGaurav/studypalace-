@@ -204,7 +204,7 @@ export function listProducts(q: ProductQuery = {}): Product[] {
     params.push(...q.ids);
   }
   if (q.search) {
-    where.push('(LOWER(title) LIKE ? OR LOWER(COALESCE(subtitle,"")) LIKE ? OR LOWER(COALESCE(description,"")) LIKE ? OR LOWER(COALESCE(tags,"")) LIKE ? OR LOWER(COALESCE(category,"")) LIKE ?)');
+    where.push("(LOWER(title) LIKE ? OR LOWER(COALESCE(subtitle,'')) LIKE ? OR LOWER(COALESCE(description,'')) LIKE ? OR LOWER(COALESCE(tags,'')) LIKE ? OR LOWER(COALESCE(category,'')) LIKE ?)");
     const like = `%${q.search.toLowerCase()}%`;
     params.push(like, like, like, like, like);
   }
@@ -242,7 +242,7 @@ export function countProducts(q: ProductQuery = {}): number {
   if (q.activeOnly !== false) where.push('is_active = ?'), params.push(1);
   if (q.category) where.push('LOWER(category) = LOWER(?)'), params.push(q.category);
   if (q.search) {
-    where.push('(LOWER(title) LIKE ? OR LOWER(COALESCE(subtitle,"")) LIKE ? OR LOWER(COALESCE(tags,"")) LIKE ?)');
+    where.push("(LOWER(title) LIKE ? OR LOWER(COALESCE(subtitle,'')) LIKE ? OR LOWER(COALESCE(tags,'')) LIKE ?)");
     const like = `%${q.search.toLowerCase()}%`;
     params.push(like, like, like);
   }
@@ -480,7 +480,7 @@ export function listOrders(q: OrderListQuery = {}): { rows: Order[]; total: numb
   const params: unknown[] = [];
   if (q.status && q.status !== 'all') where.push('status = ?'), params.push(q.status);
   if (q.search) {
-    where.push('(LOWER(email) LIKE ? OR LOWER(COALESCE(name,"")) LIKE ? OR UPPER(COALESCE(order_number,"")) LIKE ? OR COALESCE(razorpay_payment_id,"") LIKE ?)');
+    where.push("(LOWER(email) LIKE ? OR LOWER(COALESCE(name,'')) LIKE ? OR UPPER(COALESCE(order_number,'')) LIKE ? OR COALESCE(razorpay_payment_id,'') LIKE ?)");
     const like = `%${q.search.toLowerCase()}%`;
     params.push(like, like, q.search.toUpperCase(), like);
   }
